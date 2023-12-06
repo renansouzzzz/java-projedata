@@ -2,10 +2,9 @@ package br.com.testeprojedata.controller;
 
 import br.com.testeprojedata.models.Person;
 import br.com.testeprojedata.service.PersonService;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,5 +24,17 @@ public class PersonController {
         personService.insertAllPerson();
 
         return ResponseEntity.ok(personService.getAll());
+    }
+
+    @GetMapping("/get-all")
+    public ResponseEntity<List<Person>> getAll() {
+
+        return ResponseEntity.ok(personService.getAll());
+    }
+
+    @DeleteMapping
+    public ResponseEntity<String> deleteUserJoao() {
+
+        return ResponseEntity.ok(personService.removeUser());
     }
 }

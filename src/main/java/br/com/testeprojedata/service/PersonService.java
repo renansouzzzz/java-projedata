@@ -2,6 +2,7 @@ package br.com.testeprojedata.service;
 
 import br.com.testeprojedata.models.Employee;
 import br.com.testeprojedata.models.Person;
+import br.com.testeprojedata.repository.EmployeeRepository;
 import br.com.testeprojedata.repository.PersonRepository;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -11,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
@@ -20,6 +22,13 @@ public class PersonService {
 
     @Autowired
     private PersonRepository personRepository;
+
+    @Autowired
+    private EmployeeRepository employeeRepository;
+
+    private Person createEmployee(String name, LocalDate birthDate, String jobRole, BigDecimal salary) {
+        return new Employee(name, birthDate, jobRole, salary);
+    }
 
     public void insertAllPerson() {
 
@@ -39,12 +48,31 @@ public class PersonService {
     personRepository.saveAll(employees);
     }
 
-    private Person createEmployee(String name, LocalDate birthDate, String jobRole, BigDecimal salary) {
-        return new Employee(name, birthDate, jobRole, salary);
+    public String removeUser() {
+
+        Person joao = personRepository.findByName("João");
+
+        personRepository.delete(joao);
+
+        return MessageFormat.format("Usuário {0} deletado com sucesso!", joao.getName());
     }
+
 
     public List<Person> getAll() {
 
         return personRepository.findAll();
+    }
+
+    public List<Employee> salaryTenPorcent() {
+
+        List<Employee> persons = employeeRepository.findAll();
+
+        List<Employee> employees = null;
+
+        persons.stream().map(employee -> employees.add(employee));
+
+        employees.stream().map(employee -> )
+
+        return ;
     }
 }
