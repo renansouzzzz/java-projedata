@@ -67,13 +67,12 @@ public class PersonService {
         List<Employee> employees = employeeRepository.findAll();
 
         List<Employee> updatedEmployees = employees.stream()
-                .map(employee -> {
+                .peek(employee -> {
 
                     BigDecimal currentSalary = employee.getSalary();
                     BigDecimal bonus = currentSalary.multiply(new BigDecimal("0.10"));
                     BigDecimal updatedSalary = currentSalary.add(bonus);
                     employee.setSalary(updatedSalary);
-                    return employee;
                 })
                 .collect(Collectors.toList());
 
