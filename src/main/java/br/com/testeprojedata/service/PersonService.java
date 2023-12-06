@@ -4,18 +4,14 @@ import br.com.testeprojedata.models.Employee;
 import br.com.testeprojedata.models.Person;
 import br.com.testeprojedata.repository.EmployeeRepository;
 import br.com.testeprojedata.repository.PersonRepository;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.Local;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class PersonService {
@@ -25,6 +21,9 @@ public class PersonService {
 
     @Autowired
     private EmployeeRepository employeeRepository;
+
+    private final BigDecimal MINIMUM_SALARY = new BigDecimal("1212.00");
+
 
     private Person createEmployee(String name, LocalDate birthDate, String jobRole, BigDecimal salary) {
         return new Employee(name, birthDate, jobRole, salary);
@@ -45,7 +44,7 @@ public class PersonService {
                 createEmployee("Helena", LocalDate.of(1996, 9, 2), "Gerente", new BigDecimal("2799.93"))
         );
 
-    personRepository.saveAll(employees);
+        personRepository.saveAll(employees);
     }
 
     public String removeUser() {
@@ -63,16 +62,106 @@ public class PersonService {
         return personRepository.findAll();
     }
 
-    public List<Employee> salaryTenPorcent() {
+    public List<Employee> applySalaryBonus() {
 
-        List<Employee> persons = employeeRepository.findAll();
+        List<Employee> employees = employeeRepository.findAll();
 
-        List<Employee> employees = null;
+        List<Employee> updatedEmployees = employees.stream()
+                .map(employee -> {
 
-        persons.stream().map(employee -> employees.add(employee));
+                    BigDecimal currentSalary = employee.getSalary();
+                    BigDecimal bonus = currentSalary.multiply(new BigDecimal("0.10"));
+                    BigDecimal updatedSalary = currentSalary.add(bonus);
+                    employee.setSalary(updatedSalary);
+                    return employee;
+                })
+                .collect(Collectors.toList());
 
-        employees.stream().map(employee -> )
+        employeeRepository.saveAll(updatedEmployees);
 
-        return ;
+        return updatedEmployees;
+    }
+
+    public Map<String, List<Employee>> groupEmployeesByJobRole() {
+
+        List<Employee> employees = employeeRepository.findAll();
+
+        return employees.stream()
+                .collect(Collectors.groupingBy(Employee::getJobRole));
+    }
+
+    public List<Employee> employeesBirthDay() {
+
+        List<Employee> employees = employeeRepository.findAll();
+
+        List<Employee> selectedEmployees = employees.stream()
+                .filter(employee -> {
+                    int birthMonth = employee.getBirthDate().getMonthValue();
+                    return birthMonth == 10 || birthMonth == 12;
+                })
+                .toList();
+
+        selectedEmployees.forEach(employee -> {
+            System.out.println("Nome: " + employee.getName() +
+                    ", Data de Aniversário: " + employee.getBirthDate());
+        });
+
+        return selectedEmployees;
+    }
+
+    public String employeesOlder() {
+
+        List<Employee> employees = employeeRepository.findAll();
+
+        Optional<Employee> oldestEmployee = employees.stream()
+                .max(Comparator.comparingInt(employee ->
+                        LocalDate.now().getYear() - employee.getBirthDate().getYear()));
+
+        int yearsOld = LocalDate.now().getYear() - oldestEmployee.get().getBirthDate().getYear();
+
+        return "Nome: " + oldestEmployee.get().getName() + " | " + " Idade: " + yearsOld;
+    }
+
+    public List<Employee> employeesByAlphabeticalOrder() {
+
+        List<Employee> employees = employeeRepository.findAll();
+
+        return employees.stream()
+                .sorted(Comparator.comparing(Employee::getName))
+                .toList();
+    }
+
+    public BigDecimal employeesTotalSalary() {
+
+        List<Employee> employees = employeeRepository.findAll();
+
+        List<BigDecimal> salaries = employees.stream()
+                .map(Employee::getSalary)
+                .toList();
+
+        return salaries.stream()
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    public String employeesByMinimumSalary() {
+
+        List<Employee> employees = employeeRepository.findAll();
+
+        StringBuilder result = new StringBuilder();
+
+
+        employees.forEach(employee -> {
+            BigDecimal salary = employee.getSalary();
+            BigDecimal quantitySalaryMinimum = salary.divide(MINIMUM_SALARY, 2, BigDecimal.ROUND_HALF_UP);
+
+            result.append("Nome: ").append(employee.getName())
+                    .append(" | Salário: ").append(salary)
+                    .append(" | Salários Mínimos: ").append(quantitySalaryMinimum)
+                    .append("\n");
+
+        });
+
+        return result.toString();
+
     }
 }
