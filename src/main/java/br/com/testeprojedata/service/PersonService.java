@@ -148,8 +148,7 @@ public class PersonService {
         List<Employee> employees = employeeRepository.findAll();
 
         StringBuilder result = new StringBuilder();
-
-
+        
         employees.forEach(employee -> {
             BigDecimal salary = employee.getSalary();
             BigDecimal quantitySalaryMinimum = salary.divide(MINIMUM_SALARY, 2, BigDecimal.ROUND_HALF_UP);
