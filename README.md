@@ -1,3 +1,11 @@
+## Spring boot
+
+Lembrando que é uma aplicação em Spring, então é necessário rodar:
+
+```bash
+  mvn spring-boot:run
+```
+
 ## MySQL + Docker
 
 Execute o seguinte comando para buildar container mySQL:
